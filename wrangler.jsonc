@@ -1,0 +1,16 @@
+{
+  "compatibility_date": "2025-10-08",
+  "main": "src/index.ts",
+  "name": "cddashboard",
+  "upload_source_maps": true,
+  "observability": {
+    "enabled": true
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cddashboard",
+      "database_id": "5e68c884-941d-4e72-8ae6-00acc9909ab3"
+    }
+  ]
+}

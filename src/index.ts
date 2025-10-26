@@ -48,3 +48,29 @@ openapi.post("/dummy/:slug", DummyEndpoint);
 
 // Export the Hono app
 export default app;
+// src/index.ts
+import { Hono } from "hono";
+
+const app = new Hono();
+
+// --- LEGG TIL: enkel /morning-report for å bekrefte at routing virker ---
+app.get("/morning-report", (c) =>
+  c.json({
+    ok: true,
+    message: "Routing virker – bytt ut med ekte generator når klar.",
+    generated_at: new Date().toISOString(),
+    window_hours: 24,
+    categories: {
+      world_major_incidents: { items: [] },
+      norway_incidents: { items: [] },
+      key_reports: { items: [] },
+      cyberforsvaret_social: { items: [] },
+      milno_targeting: { items: [] },
+      cyberforsvaret_media: { items: [] },
+      mil_ops_analysis: { items: [] },
+    },
+    meta: { titles: {} },
+  })
+);
+
+export default app;

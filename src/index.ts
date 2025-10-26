@@ -3,27 +3,21 @@ import { Hono } from "hono";
 import { tasksRouter } from "./endpoints/tasks/router";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { DummyEndpoint } from "./endpoints/dummyEndpoint";
+import morningReport from "./endpoints/morningReport"; // <-- NY: routeren din
 
 // Start a Hono app
 const app = new Hono<{ Bindings: Env }>();
 
 app.onError((err, c) => {
   if (err instanceof ApiException) {
-    // If it's a Chanfana ApiException, let Chanfana handle the response
     return c.json(
       { success: false, errors: err.buildResponse() },
       err.status as ContentfulStatusCode,
     );
   }
-
-  console.error("Global error handler caught:", err); // Log the error if it's not known
-
-  // For other errors, return a generic 500 response
+  console.error("Global error handler caught:", err);
   return c.json(
-    {
-      success: false,
-      errors: [{ code: 7000, message: "Internal Server Error" }],
-    },
+    { success: false, errors: [{ code: 7000, message: "Internal Server Error" }] },
     500,
   );
 });
@@ -40,37 +34,12 @@ const openapi = fromHono(app, {
   },
 });
 
-// Register Tasks Sub router
+// Register routers/endpoints under the same app (IKKE lag en ny app under her)
 openapi.route("/tasks", tasksRouter);
-
-// Register other endpoints
 openapi.post("/dummy/:slug", DummyEndpoint);
 
-// Export the Hono app
-export default app;
-// src/index.ts
-import { Hono } from "hono";
+// <-- VIKTIG: Monter morningReport-routeren (eksponerer /morning-report)
+openapi.route("/", morningReport);
 
-const app = new Hono();
-
-// --- LEGG TIL: enkel /morning-report for å bekrefte at routing virker ---
-app.get("/morning-report", (c) =>
-  c.json({
-    ok: true,
-    message: "Routing virker – bytt ut med ekte generator når klar.",
-    generated_at: new Date().toISOString(),
-    window_hours: 24,
-    categories: {
-      world_major_incidents: { items: [] },
-      norway_incidents: { items: [] },
-      key_reports: { items: [] },
-      cyberforsvaret_social: { items: [] },
-      milno_targeting: { items: [] },
-      cyberforsvaret_media: { items: [] },
-      mil_ops_analysis: { items: [] },
-    },
-    meta: { titles: {} },
-  })
-);
-
+// ÉN eneste export default
 export default app;
